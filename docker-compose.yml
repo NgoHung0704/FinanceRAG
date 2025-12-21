@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  financerag:
+    build: .
+    container_name: financerag-notebook
+    ports:
+      - "8888:8888"
+    volumes:
+      - .:/workspace
+      - financerag-cache:/root/.cache
+    environment:
+      - PYTHONPATH=/workspace
+    working_dir: /workspace
+    command: jupyter lab --ip=0.0.0.0 --port=8888 --no-browser --allow-root --NotebookApp.token='' --NotebookApp.password=''
+
+volumes:
+  financerag-cache:
