@@ -86,12 +86,36 @@ class BaseTask:
         if (self.corpus is None) or (self.queries is None):
             dataset_path = self.metadata_dict["dataset"]["path"]
             subset = self.metadata_dict["dataset"]["subset"]
+            query_subset = self.metadata_dict["dataset"].get("query_subset", subset)
+            use_local = self.metadata_dict["dataset"].get("use_local", False)
 
-            corpus, queries = HFDataLoader(
-                hf_repo=dataset_path,
-                subset=subset,
-                keep_in_memory=False,
-            ).load()
+            # If use_local is True, use data_folder instead of hf_repo
+            if use_local:
+                from pathlib import Path
+                # Build paths directly for the specific structure
+                # Resolve to absolute paths - if relative, resolve from project root
+                data_path = Path(dataset_path)
+                if not data_path.is_absolute():
+                    # Get project root (parent of financerag package)
+                    project_root = Path(__file__).parent.parent.parent
+                    data_path = (project_root / dataset_path).resolve()
+                else:
+                    data_path = data_path.resolve()
+                    
+                corpus_file = (data_path / subset / "corpus.jsonl").as_posix()
+                query_file = (data_path / query_subset / "queries.jsonl").as_posix()
+                
+                corpus, queries = HFDataLoader(
+                    corpus_file=corpus_file,
+                    query_file=query_file,
+                    keep_in_memory=False,
+                ).load()
+            else:
+                corpus, queries = HFDataLoader(
+                    hf_repo=dataset_path,
+                    subset=subset,
+                    keep_in_memory=False,
+                ).load()
 
             self.queries = {query["id"]: query["text"] for query in queries}
             self.corpus = {

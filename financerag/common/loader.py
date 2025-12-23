@@ -67,24 +67,29 @@ class HFDataLoader:
                 "A Hugging Face repository is provided. This will override the data_folder, prefix, and *_file arguments."
             )
         else:
-            if (data_folder is None) or (subset is None):
+            # If corpus_file and query_file are provided as absolute paths, use them directly
+            if Path(corpus_file).exists() and Path(query_file).exists():
+                self.corpus_file = corpus_file
+                self.query_file = query_file
+            elif (data_folder is None) or (subset is None):
                 raise ValueError(
-                    "A Hugging Face repository or local directory is required."
+                    "Either provide absolute paths for corpus_file and query_file, or provide data_folder and subset."
                 )
+            else:
+                # Build paths from data_folder and subset
+                if prefix:
+                    query_file = prefix + "_" + query_file
 
-            if prefix:
-                query_file = prefix + "_" + query_file
-
-            self.corpus_file = (
-                (Path(data_folder) / subset / corpus_file).as_posix()
-                if data_folder
-                else corpus_file
-            )
-            self.query_file = (
-                (Path(data_folder) / subset / query_file).as_posix()
-                if data_folder
-                else query_file
-            )
+                self.corpus_file = (
+                    (Path(data_folder) / subset / corpus_file).as_posix()
+                    if data_folder
+                    else corpus_file
+                )
+                self.query_file = (
+                    (Path(data_folder) / subset / query_file).as_posix()
+                    if data_folder
+                    else query_file
+                )
         self.streaming = False
         self.keep_in_memory = keep_in_memory
 
@@ -178,6 +183,9 @@ class HFDataLoader:
                 streaming=self.streaming,
                 keep_in_memory=self.keep_in_memory,
             )
+            # Extract the 'train' split from DatasetDict
+            if isinstance(corpus_ds, dict):
+                corpus_ds = corpus_ds['train']
 
         corpus_ds = cast(Dataset, corpus_ds)
         corpus_ds = corpus_ds.cast_column("_id", Value("string"))
@@ -211,6 +219,9 @@ class HFDataLoader:
                 streaming=self.streaming,
                 keep_in_memory=self.keep_in_memory,
             )
+            # Extract the 'train' split from DatasetDict
+            if isinstance(queries_ds, dict):
+                queries_ds = queries_ds['train']
         queries_ds = cast(Dataset, queries_ds)
         queries_ds = queries_ds.cast_column("_id", Value("string"))
         queries_ds = queries_ds.rename_column("_id", "id")
