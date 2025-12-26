@@ -84,14 +84,25 @@ class BaseTask:
                 If the dataset cannot be loaded from the specified path and subset.
         """
         if (self.corpus is None) or (self.queries is None):
-            dataset_path = self.metadata_dict["dataset"]["path"]
-            subset = self.metadata_dict["dataset"]["subset"]
-
-            corpus, queries = HFDataLoader(
-                hf_repo=dataset_path,
-                subset=subset,
-                keep_in_memory=False,
-            ).load()
+            dataset_config = self.metadata_dict["dataset"]
+            subset = dataset_config["subset"]
+            
+            # Check if loading from local data or HuggingFace Hub
+            if "data_folder" in dataset_config:
+                # Load from local files
+                corpus, queries = HFDataLoader(
+                    data_folder=dataset_config["data_folder"],
+                    subset=subset,
+                    keep_in_memory=False,
+                ).load()
+            else:
+                # Load from HuggingFace Hub
+                dataset_path = dataset_config["path"]
+                corpus, queries = HFDataLoader(
+                    hf_repo=dataset_path,
+                    subset=subset,
+                    keep_in_memory=False,
+                ).load()
 
             self.queries = {query["id"]: query["text"] for query in queries}
             self.corpus = {
