@@ -1,0 +1,90 @@
+
+================================================================================
+CHUNKING EVALUATION REPORT
+================================================================================
+
+Date: 2025-12-28 15:57:37
+
+CONFIGURATION:
+  Strategy: balanced
+  Chunking Method: character
+  Chunk Size: 1500
+  Chunk Overlap: 300
+  Model: sentence-transformers/all-MiniLM-L6-v2
+  Top-K: 10
+
+DATASETS EVALUATED:
+  - convfinqa
+  - financebench
+  - finder
+  - finqa
+  - finqabench
+  - multiheirtt
+  - tatqa
+
+
+OVERALL RESULTS:
+  Average Chunked NDCG@10: 0.4286
+  Average Chunked Recall@10: 0.4869
+  Average Expansion Factor: 1.54x
+
+
+BASELINE COMPARISON:
+  Average Baseline NDCG@10: 0.3692
+  Average Baseline Recall@10: 0.4275
+
+  Average NDCG Improvement: +23.38%
+  Average Recall Improvement: +20.04%
+
+
+PER-DATASET RESULTS:
+
+  CONVFINQA:
+    Docs: 2066 → Chunks: 4992 (expansion: 2.42x)
+    Chunked NDCG: 0.4524 | Recall: 0.4524
+    Baseline NDCG: 0.2937 | Recall: 0.2937
+    Improvement: NDCG +54.05% | Recall +54.05%
+
+  FINANCEBENCH:
+    Docs: 180 → Chunks: 221 (expansion: 1.23x)
+    Chunked NDCG: 0.4889 | Recall: 0.7444
+    Baseline NDCG: 0.4889 | Recall: 0.7444
+    Improvement: NDCG +0.00% | Recall +0.00%
+
+  FINDER:
+    Docs: 13867 → Chunks: 13862 (expansion: 1.00x)
+    Chunked NDCG: 0.2188 | Recall: 0.3161
+    Baseline NDCG: 0.2188 | Recall: 0.3161
+    Improvement: NDCG +0.00% | Recall +0.00%
+
+  FINQA:
+    Docs: 2789 → Chunks: 6744 (expansion: 2.42x)
+    Chunked NDCG: 0.4593 | Recall: 0.4593
+    Baseline NDCG: 0.2762 | Recall: 0.2762
+    Improvement: NDCG +66.32% | Recall +66.32%
+
+  FINQABENCH:
+    Docs: 92 → Chunks: 92 (expansion: 1.00x)
+    Chunked NDCG: 0.9333 | Recall: 0.9333
+    Baseline NDCG: 0.9333 | Recall: 0.9333
+    Improvement: NDCG +0.00% | Recall +0.00%
+
+  MULTIHEIRTT:
+    Docs: 10475 → Chunks: 10480 (expansion: 1.00x)
+    Chunked NDCG: 0.0000 | Recall: 0.0551
+    Baseline NDCG: 0.0000 | Recall: 0.0551
+    Improvement: NDCG +nan% | Recall +0.00%
+
+  TATQA:
+    Docs: 2756 → Chunks: 4686 (expansion: 1.70x)
+    Chunked NDCG: 0.4478 | Recall: 0.4478
+    Baseline NDCG: 0.3735 | Recall: 0.3735
+    Improvement: NDCG +19.89% | Recall +19.89%
+
+
+OUTPUT FILES:
+  Results: output_chunking_eval\results_balanced.csv
+  Submission: output_chunking_eval\submission_chunked.csv
+  Chunked Corpora: output_chunking_eval/*_corpus_chunked.jsonl
+
+================================================================================

@@ -1,0 +1,44 @@
+
+================================================================================
+FINAL SUBMISSION PIPELINE - EXECUTION REPORT
+================================================================================
+
+Date: 2025-12-31 22:54:01
+
+CONFIGURATION:
+  Chunking: character (size=1500, overlap=300)
+  Embedding Model: sentence-transformers/all-MiniLM-L6-v2
+  Reranker: BAAI/bge-reranker-v2-m3
+  Retrieval: Dense Only
+  Pipeline: Chunk → Retrieve (100) → Aggregate → Rerank (50) → Top-10
+
+DATASETS PROCESSED:
+  ✓ convfinqa
+  ✓ financebench
+  ✓ finder
+  ✓ finqa
+  ✓ finqabench
+  ✓ multiheirtt
+  ✓ tatqa
+
+
+SUBMISSION:
+  File: output_final_submission\submission_final.csv
+  Total Queries: 4671
+  Format: query_id | corpus_ids (space-separated, top-10)
+
+EXPECTED PERFORMANCE (from chunking analysis):
+  NDCG@10: ~92.6%
+  Recall@10: ~85.2%
+  Expansion Factor: 1.52x
+
+NEXT STEPS:
+  1. Validate submission format
+  2. Submit to competition platform
+  3. Monitor leaderboard performance
+  4. If needed, try different strategies:
+     - Adjust hybrid_alpha
+     - Try different chunking strategies (max_performance, high_precision)
+     - Experiment with different reranking models
+
+================================================================================
