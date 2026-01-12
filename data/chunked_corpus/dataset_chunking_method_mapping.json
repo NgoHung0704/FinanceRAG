@@ -1,0 +1,37 @@
+{
+  "convfinqa": {
+    "method": "semantic",
+    "chunk_size": 2000,
+    "chunk_overlap": 0.6
+  },
+  "financebench": {
+    "method": "semantic",
+    "chunk_size": 1000,
+    "chunk_overlap": 0.7
+  },
+  "finder": {
+    "method": "recursive",
+    "chunk_size": 512,
+    "chunk_overlap": 50
+  },
+  "finqa": {
+    "method": "semantic",
+    "chunk_size": 2500,
+    "chunk_overlap": 0.65
+  },
+  "finqabench": {
+    "method": "preserve_tables",
+    "chunk_size": 1024,
+    "chunk_overlap": 100
+  },
+  "multiheirtt": {
+    "method": "semantic",
+    "chunk_size": 3000,
+    "chunk_overlap": 0.65
+  },
+  "tatqa": {
+    "method": "semantic",
+    "chunk_size": 2000,
+    "chunk_overlap": 0.7
+  }
+}

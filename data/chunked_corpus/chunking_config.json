@@ -1,0 +1,8 @@
+{
+  "use_chunked_corpus": true,
+  "chunked_corpus_dir": "..\\data\\chunked_corpus",
+  "aggregation_method": "max",
+  "chunk_size": 1000,
+  "chunk_overlap": 200,
+  "chunking_method": "recursive"
+}

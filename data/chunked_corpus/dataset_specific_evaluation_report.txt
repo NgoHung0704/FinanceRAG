@@ -1,0 +1,158 @@
+
+====================================================================================================
+📊 DATASET-SPECIFIC CHUNKING EVALUATION SUMMARY (v2 - with Semantic Chunking)
+====================================================================================================
+
+🎯 OBJECTIVE
+Find the OPTIMAL chunking strategy for EACH dataset in FinanceRAG
+Including NEW semantic-based chunking methods!
+
+📚 DATASETS EVALUATED
+convfinqa, financebench, finder, finqa, finqabench, multiheirtt, tatqa
+Total: 7 datasets
+
+🆕 NEW CHUNKING METHODS TESTED
+- semantic: Similarity-based sentence grouping
+- row_based: Table row chunking with headers
+- table_linearization: Convert tables to natural text
+- sliding_window: Dense overlapping chunks
+- sentence_window: Sentence + context window
+- table_context: Table + surrounding paragraph
+- hybrid_semantic_table: Semantic for text, preserve tables
+
+📌 ORIGINAL METHODS
+- no_chunking: Keep documents whole
+- preserve_tables: Large chunks preserving table structure
+- recursive: Recursive character splitting
+- fixed: Fixed-size splitting
+
+🔬 EVALUATION APPROACH
+Total evaluation runs: 28
+Queries per dataset: 30
+Embedding model: BAAI/bge-large-en-v1.5
+Semantic chunking model: sentence-transformers/all-MiniLM-L6-v2
+
+====================================================================================================
+🏆 BEST CONFIGURATION PER DATASET
+====================================================================================================
+
+
+📌 CONVFINQA 🆕 NEW!
+   Dataset type: hybrid_tables
+   Description: Tables + narrative text, very long documents
+   → Best method: semantic (param1=2000, param2=0.6)
+   → NDCG@10: 0.6591 ± 0.4205
+
+📌 FINANCEBENCH 🆕 NEW!
+   Dataset type: pure_text
+   Description: Pure text, medium length, narrative
+   → Best method: semantic (param1=1000, param2=0.7)
+   → NDCG@10: 0.7938 ± 0.2576
+
+📌 FINDER 
+   Dataset type: short_text
+   Description: Very short text, large corpus (13K docs)
+   → Best method: recursive (param1=512, param2=50)
+   → NDCG@10: 0.7046 ± 0.3551
+   → Improvement vs no chunking: +6.6% 🟢
+
+📌 FINQA 🆕 NEW!
+   Dataset type: hybrid_tables
+   Description: Tables + text, long documents
+   → Best method: semantic (param1=2500, param2=0.65)
+   → NDCG@10: 0.6284 ± 0.3366
+
+📌 FINQABENCH 
+   Dataset type: mixed
+   Description: Mixed content, small corpus (92 docs)
+   → Best method: preserve_tables (param1=1024, param2=100)
+   → NDCG@10: 0.8676 ± 0.2107
+   → Improvement vs no chunking: +0.0% 🟡
+
+📌 MULTIHEIRTT 🆕 NEW!
+   Dataset type: hierarchical_tables
+   Description: Hierarchical tables with multi-level structure
+   → Best method: semantic (param1=3000, param2=0.65)
+   → NDCG@10: 0.2131 ± 0.1638
+   → Improvement vs no chunking: +30.7% 🟢
+
+📌 TATQA 🆕 NEW!
+   Dataset type: pure_tables
+   Description: Pure tables with numerical reasoning
+   → Best method: semantic (param1=2000, param2=0.7)
+   → NDCG@10: 0.5335 ± 0.4043
+   → Improvement vs no chunking: +43.5% 🟢
+
+====================================================================================================
+📈 OVERALL PERFORMANCE
+====================================================================================================
+
+Average NDCG@10 (with optimal per-dataset): 0.6286
+Baseline Average (no chunking): 0.5158
+Overall Improvement: +21.9%
+
+🆕 New methods adopted: 5/7 datasets
+
+====================================================================================================
+💡 KEY INSIGHTS
+====================================================================================================
+
+1. SEMANTIC CHUNKING EFFECTIVENESS
+   - Groups semantically related sentences together
+   - Particularly good for: Long narrative text, hybrid documents
+   - Tested on all datasets with different similarity thresholds
+
+2. TABLE-SPECIFIC METHODS
+   - row_based: Best for tables with many independent rows
+   - table_linearization: Makes tables more LLM-friendly
+   - table_context: Keeps tables with explanatory context
+   - preserve_tables: Safe option for table-heavy datasets
+
+3. OVERLAP STRATEGIES
+   - sliding_window: Dense overlap for maximum coverage
+   - sentence_window: Centered on individual sentences
+
+4. DATASET-SPECIFIC FINDINGS
+   🆕 multiheirtt: semantic → NDCG=0.2131
+   🆕 tatqa: semantic → NDCG=0.5335
+   🆕 convfinqa: semantic → NDCG=0.6591
+   🆕 finqa: semantic → NDCG=0.6284
+
+5. METHOD EFFECTIVENESS RANKING
+   🆕 sentence_window: avg NDCG@10 = 0.7744 (n=1)
+      recursive: avg NDCG@10 = 0.7052 (n=6)
+      fixed: avg NDCG@10 = 0.6936 (n=1)
+   🆕 hybrid_semantic_table: avg NDCG@10 = 0.6499 (n=1)
+   🆕 semantic: avg NDCG@10 = 0.6191 (n=7)
+   🆕 sliding_window: avg NDCG@10 = 0.6127 (n=1)
+      no_chunking: avg NDCG@10 = 0.5158 (n=4)
+      preserve_tables: avg NDCG@10 = 0.4683 (n=4)
+   🆕 table_context: avg NDCG@10 = 0.4301 (n=1)
+   🆕 table_linearization: avg NDCG@10 = 0.3412 (n=1)
+   🆕 row_based: avg NDCG@10 = 0.1630 (n=1)
+
+====================================================================================================
+📦 OUTPUT FILES
+====================================================================================================
+
+1. Best config per dataset:     best_chunking_config_per_dataset.json
+2. Method mapping for prod:     dataset_chunking_method_mapping.json
+3. Detailed results:            dataset_specific_chunking_results.csv
+4. Visualizations:              dataset_specific_chunking_evaluation.png
+5. Chunked corpora:             7 files (*_corpus_chunked_optimal.jsonl)
+
+🎓 RECOMMENDATIONS
+====================================================================================================
+
+✅ Use semantic chunking for text-heavy datasets (financebench, finder)
+✅ Use table-aware methods for table datasets (tatqa, multiheirtt)
+✅ Hybrid methods work well for mixed content (convfinqa, finqa)
+✅ Consider sliding_window for maximum recall at cost of more chunks
+✅ Always aggregate chunk scores back to document level (max score)
+✅ Re-evaluate when adding new datasets or changing embedding models
+
+====================================================================================================
+Generated: 2026-01-08 08:47:37
+Embedding model: BAAI/bge-large-en-v1.5
+Semantic chunking model: sentence-transformers/all-MiniLM-L6-v2
+====================================================================================================
