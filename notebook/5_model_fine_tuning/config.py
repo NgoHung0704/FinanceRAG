@@ -80,7 +80,7 @@ TRAINING_CONFIG = {
     'val_ratio': 0.1,
     
     # Training hyperparameters - CONSERVATIVE for small data
-    'epochs': 10,                   # Reduced from 20
+    'epochs': 20,                   # Reduced from 20
     'batch_size': 16,               # Smaller batch for more gradient updates
     'gradient_accumulation': 4,     # Effective batch = 64
     'learning_rate': 1e-5,          # Lower LR for stability
