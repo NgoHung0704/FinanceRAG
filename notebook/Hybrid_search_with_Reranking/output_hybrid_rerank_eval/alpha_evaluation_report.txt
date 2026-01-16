@@ -1,0 +1,21 @@
+================================================================================
+HYBRID ALPHA EVALUATION REPORT
+================================================================================
+
+Dataset Preferences:
+  Dense-heavy: 1
+  Balanced: 2
+  BM25-heavy: 4
+
+Average Best Alpha: 0.37
+
+Best Alpha per Dataset:
+  convfinqa: α=0.1, NDCG@10=0.4385
+  financebench: α=0.5, NDCG@10=0.8670
+  finder: α=0.4, NDCG@10=0.4575
+  finqa: α=0.9, NDCG@10=0.4176
+  finqabench: α=0.1, NDCG@10=0.8716
+  multiheirtt: α=0.1, NDCG@10=0.0928
+  tatqa: α=0.5, NDCG@10=0.4224
+
+Average NDCG@10: 0.5096

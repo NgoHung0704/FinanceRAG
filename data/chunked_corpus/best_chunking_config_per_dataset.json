@@ -1,51 +1,30 @@
 {
-  "convfinqa": {
-    "method": "semantic",
-    "chunk_size": 2000,
-    "chunk_overlap": 0.6,
-    "ndcg_10": 0.6591340228620299,
-    "std_ndcg": 0.4204597471451942
-  },
-  "financebench": {
-    "method": "semantic",
-    "chunk_size": 1000,
-    "chunk_overlap": 0.7,
-    "ndcg_10": 0.7937537690282784,
-    "std_ndcg": 0.25759536066963185
-  },
   "finder": {
-    "method": "recursive",
-    "chunk_size": 512,
-    "chunk_overlap": 50,
-    "ndcg_10": 0.7045637694230878,
-    "std_ndcg": 0.35514483513958595
-  },
-  "finqa": {
-    "method": "semantic",
-    "chunk_size": 2500,
-    "chunk_overlap": 0.65,
-    "ndcg_10": 0.6283771270039336,
-    "std_ndcg": 0.33657375582731913
+    "method": "no_chunking",
+    "chunk_size": null,
+    "chunk_overlap": null,
+    "ndcg_10": 0.6577764444462039,
+    "std_ndcg": 0.3445943967627105
   },
   "finqabench": {
-    "method": "preserve_tables",
-    "chunk_size": 1024,
-    "chunk_overlap": 100,
-    "ndcg_10": 0.8676212838590438,
-    "std_ndcg": 0.21071086130102873
+    "method": "no_chunking",
+    "chunk_size": null,
+    "chunk_overlap": null,
+    "ndcg_10": 0.9192441461309548,
+    "std_ndcg": 0.22696319749304952
   },
   "multiheirtt": {
-    "method": "semantic",
-    "chunk_size": 3000,
-    "chunk_overlap": 0.65,
-    "ndcg_10": 0.21314121795224633,
-    "std_ndcg": 0.1638208436733781
+    "method": "no_chunking",
+    "chunk_size": null,
+    "chunk_overlap": null,
+    "ndcg_10": 0.1804790277746528,
+    "std_ndcg": 0.19340563527551954
   },
   "tatqa": {
-    "method": "semantic",
-    "chunk_size": 2000,
-    "chunk_overlap": 0.7,
-    "ndcg_10": 0.5334543830468178,
-    "std_ndcg": 0.4042592782203354
+    "method": "no_chunking",
+    "chunk_size": null,
+    "chunk_overlap": null,
+    "ndcg_10": 0.45272663764125093,
+    "std_ndcg": 0.41477350466696833
   }
 }

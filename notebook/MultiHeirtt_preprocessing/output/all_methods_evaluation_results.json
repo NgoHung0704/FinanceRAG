@@ -1,0 +1,489 @@
+{
+  "summary": {
+    "original_ndcg": 0.18797741741023108,
+    "linearized_ndcg": 0.20547765303547946,
+    "augmented_ndcg": 0.18797741741023108,
+    "rowchunks_ndcg": 0.18797741741023108,
+    "best_method": "Linearized",
+    "best_score": 0.20547765303547946,
+    "num_queries_evaluated": 40
+  },
+  "comparison_table": [
+    {
+      "Method": "Linearized",
+      "NDCG@10": 0.20547765303547946,
+      "Improvement": 0.017500235625248384,
+      "Improvement %": 9.3
+    },
+    {
+      "Method": "Original (baseline)",
+      "NDCG@10": 0.18797741741023108,
+      "Improvement": 0.0,
+      "Improvement %": 0.0
+    },
+    {
+      "Method": "Augmented",
+      "NDCG@10": 0.18797741741023108,
+      "Improvement": 0.0,
+      "Improvement %": 0.0
+    },
+    {
+      "Method": "Row Chunks",
+      "NDCG@10": 0.18797741741023108,
+      "Improvement": 0.0,
+      "Improvement %": 0.0
+    }
+  ],
+  "method_scores": {
+    "original": [
+      0.2960819109658652,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.3576223542196109,
+      0.5294362295028773,
+      0.27487633291429087,
+      0.0,
+      0.21398626473452756,
+      0.24630238874073,
+      0.11004588314904008,
+      0.0,
+      0.2960819109658652,
+      0.3391602052736161,
+      0.3903800499921017,
+      0.0979129253499678,
+      0.0,
+      0.0,
+      0.10778915452451093,
+      0.0874717141014082,
+      0.0,
+      0.24630238874073,
+      0.0,
+      0.0,
+      0.30260241349881345,
+      0.0,
+      0.20210734650054757,
+      0.2960819109658652,
+      0.6364391809889587,
+      0.2529427027676571,
+      0.13032376591037062,
+      0.13120507751234178,
+      0.46927872602275644,
+      0.23719771276929622,
+      0.45221360703148816,
+      0.0,
+      0.6131471927654584,
+      0.20210734650054757,
+      0.0
+    ],
+    "linearized": [
+      0.5723986829443736,
+      0.13905617951077562,
+      0.13565197343244778,
+      0.0,
+      0.15642624200758548,
+      0.3108658234453849,
+      0.6366824387328317,
+      0.27487633291429087,
+      0.0,
+      0.44615333764087994,
+      0.0,
+      0.09478836436955078,
+      0.0,
+      0.2960819109658652,
+      0.3391602052736161,
+      0.0,
+      0.10633668103022985,
+      0.0,
+      0.0,
+      0.11706259313796354,
+      0.30260241349881345,
+      0.0,
+      0.19519002499605084,
+      0.0,
+      0.16812753627111746,
+      0.30260241349881345,
+      0.0,
+      0.2960819109658652,
+      0.46927872602275644,
+      0.46927872602275644,
+      0.2529427027676571,
+      0.13032376591037062,
+      0.13120507751234178,
+      0.2960819109658652,
+      0.21840743681816419,
+      0.45221360703148816,
+      0.0,
+      0.6131471927654584,
+      0.2960819109658652,
+      0.0
+    ],
+    "augmented": [
+      0.2960819109658652,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.3576223542196109,
+      0.5294362295028773,
+      0.27487633291429087,
+      0.0,
+      0.21398626473452756,
+      0.24630238874073,
+      0.11004588314904008,
+      0.0,
+      0.2960819109658652,
+      0.3391602052736161,
+      0.3903800499921017,
+      0.0979129253499678,
+      0.0,
+      0.0,
+      0.10778915452451093,
+      0.0874717141014082,
+      0.0,
+      0.24630238874073,
+      0.0,
+      0.0,
+      0.30260241349881345,
+      0.0,
+      0.20210734650054757,
+      0.2960819109658652,
+      0.6364391809889587,
+      0.2529427027676571,
+      0.13032376591037062,
+      0.13120507751234178,
+      0.46927872602275644,
+      0.23719771276929622,
+      0.45221360703148816,
+      0.0,
+      0.6131471927654584,
+      0.20210734650054757,
+      0.0
+    ],
+    "row_chunks": [
+      0.2960819109658652,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.3576223542196109,
+      0.5294362295028773,
+      0.27487633291429087,
+      0.0,
+      0.21398626473452756,
+      0.24630238874073,
+      0.11004588314904008,
+      0.0,
+      0.2960819109658652,
+      0.3391602052736161,
+      0.3903800499921017,
+      0.0979129253499678,
+      0.0,
+      0.0,
+      0.10778915452451093,
+      0.0874717141014082,
+      0.0,
+      0.24630238874073,
+      0.0,
+      0.0,
+      0.30260241349881345,
+      0.0,
+      0.20210734650054757,
+      0.2960819109658652,
+      0.6364391809889587,
+      0.2529427027676571,
+      0.13032376591037062,
+      0.13120507751234178,
+      0.46927872602275644,
+      0.23719771276929622,
+      0.45221360703148816,
+      0.0,
+      0.6131471927654584,
+      0.20210734650054757,
+      0.0
+    ]
+  },
+  "best_method_query_analysis": [
+    {
+      "query_id": "q82715706",
+      "query_text": "What was the total amount of Square Feet-1 /Apartm",
+      "original_ndcg": 0.2960819109658652,
+      "best_method_ndcg": 0.5723986829443736,
+      "improvement": 0.27631677197850835
+    },
+    {
+      "query_id": "q817d44ae",
+      "query_text": "What's the sum of Unvested at December 31, 2018 of",
+      "original_ndcg": 0.21398626473452756,
+      "best_method_ndcg": 0.44615333764087994,
+      "improvement": 0.23216707290635238
+    },
+    {
+      "query_id": "q83fc49be",
+      "query_text": "What is the sum of Europe of Year Ended December 3",
+      "original_ndcg": 0.0874717141014082,
+      "best_method_ndcg": 0.30260241349881345,
+      "improvement": 0.21513069939740526
+    },
+    {
+      "query_id": "q857834c4",
+      "query_text": "according to the above listed holders of common st",
+      "original_ndcg": 0.2960819109658652,
+      "best_method_ndcg": 0.46927872602275644,
+      "improvement": 0.17319681505689122
+    },
+    {
+      "query_id": "q852613f6",
+      "query_text": "Which year is Equity securities in Carrying Value ",
+      "original_ndcg": 0.0,
+      "best_method_ndcg": 0.16812753627111746,
+      "improvement": 0.16812753627111746
+    },
+    {
+      "query_id": "q815b4e3a",
+      "query_text": "What's the increasing rate of Secured debt in 2006",
+      "original_ndcg": 0.0,
+      "best_method_ndcg": 0.15642624200758548,
+      "improvement": 0.15642624200758548
+    },
+    {
+      "query_id": "q81243044",
+      "query_text": "What was the average of the Total operating revenu",
+      "original_ndcg": 0.0,
+      "best_method_ndcg": 0.13905617951077562,
+      "improvement": 0.13905617951077562
+    },
+    {
+      "query_id": "q82b17a0c",
+      "query_text": "What is the total value of Pension and employee be",
+      "original_ndcg": 0.0,
+      "best_method_ndcg": 0.13565197343244778,
+      "improvement": 0.13565197343244778
+    },
+    {
+      "query_id": "q84b273ec",
+      "query_text": "What's the sum of the equity the securities in the",
+      "original_ndcg": 0.5294362295028773,
+      "best_method_ndcg": 0.6366824387328317,
+      "improvement": 0.10724620922995443
+    },
+    {
+      "query_id": "q854dade4",
+      "query_text": "Which year is Catastrophes for Prior Years the low",
+      "original_ndcg": 0.20210734650054757,
+      "best_method_ndcg": 0.2960819109658652,
+      "improvement": 0.09397456446531766
+    },
+    {
+      "query_id": "q81ac2d50",
+      "query_text": "The total amount of which section ranks first for ",
+      "original_ndcg": 0.20210734650054757,
+      "best_method_ndcg": 0.2960819109658652,
+      "improvement": 0.09397456446531766
+    },
+    {
+      "query_id": "q854ab756",
+      "query_text": "What is the proportion of Distribution expenses to",
+      "original_ndcg": 0.10778915452451093,
+      "best_method_ndcg": 0.11706259313796354,
+      "improvement": 0.009273438613452603
+    },
+    {
+      "query_id": "q85a157e6",
+      "query_text": "What is the sum of the revenues in the years where",
+      "original_ndcg": 0.0979129253499678,
+      "best_method_ndcg": 0.10633668103022985,
+      "improvement": 0.008423755680262046
+    },
+    {
+      "query_id": "q8125caf8",
+      "query_text": "what was the average operating leases 2014rental e",
+      "original_ndcg": 0.0,
+      "best_method_ndcg": 0.0,
+      "improvement": 0.0
+    },
+    {
+      "query_id": "q85acc7b6",
+      "query_text": "In the year with the most Registered investment co",
+      "original_ndcg": 0.27487633291429087,
+      "best_method_ndcg": 0.27487633291429087,
+      "improvement": 0.0
+    },
+    {
+      "query_id": "q83e3e52c",
+      "query_text": "In terms of Assets,which year is Fair Values of To",
+      "original_ndcg": 0.0,
+      "best_method_ndcg": 0.0,
+      "improvement": 0.0
+    },
+    {
+      "query_id": "q8435886e",
+      "query_text": "% ( % ) change of the dilutive effect from 2006-20",
+      "original_ndcg": 0.0,
+      "best_method_ndcg": 0.0,
+      "improvement": 0.0
+    },
+    {
+      "query_id": "q81a371f6",
+      "query_text": "What's the average of the Attritional for Current ",
+      "original_ndcg": 0.2960819109658652,
+      "best_method_ndcg": 0.2960819109658652,
+      "improvement": 0.0
+    },
+    {
+      "query_id": "q828823aa",
+      "query_text": "what's the total amount of Accumulated benefit obl",
+      "original_ndcg": 0.3391602052736161,
+      "best_method_ndcg": 0.3391602052736161,
+      "improvement": 0.0
+    },
+    {
+      "query_id": "q83905290",
+      "query_text": "what is the percentage change in interest expense-",
+      "original_ndcg": 0.0,
+      "best_method_ndcg": 0.0,
+      "improvement": 0.0
+    },
+    {
+      "query_id": "q818fa568",
+      "query_text": "What was the total amount of the Additions to cust",
+      "original_ndcg": 0.0,
+      "best_method_ndcg": 0.0,
+      "improvement": 0.0
+    },
+    {
+      "query_id": "q838a16dc",
+      "query_text": "what is the percentage change in the balance of in",
+      "original_ndcg": 0.0,
+      "best_method_ndcg": 0.0,
+      "improvement": 0.0
+    },
+    {
+      "query_id": "q85b4b5f2",
+      "query_text": "What is the growing rate of Commission and brokera",
+      "original_ndcg": 0.0,
+      "best_method_ndcg": 0.0,
+      "improvement": 0.0
+    },
+    {
+      "query_id": "q81d4df20",
+      "query_text": "what percentage of the company's receivable balanc",
+      "original_ndcg": 0.30260241349881345,
+      "best_method_ndcg": 0.30260241349881345,
+      "improvement": 0.0
+    },
+    {
+      "query_id": "q83b8b2ee",
+      "query_text": "How many Commitment Type continues to decrease eac",
+      "original_ndcg": 0.0,
+      "best_method_ndcg": 0.0,
+      "improvement": 0.0
+    },
+    {
+      "query_id": "q83b66782",
+      "query_text": "In the year with the most Net flows, what is the g",
+      "original_ndcg": 0.2529427027676571,
+      "best_method_ndcg": 0.2529427027676571,
+      "improvement": 0.0
+    },
+    {
+      "query_id": "q82806e08",
+      "query_text": "What is the total amount of the Fee revenue in the",
+      "original_ndcg": 0.13032376591037062,
+      "best_method_ndcg": 0.13032376591037062,
+      "improvement": 0.0
+    },
+    {
+      "query_id": "q833247b8",
+      "query_text": "What is the average amount of Employee separations",
+      "original_ndcg": 0.13120507751234178,
+      "best_method_ndcg": 0.13120507751234178,
+      "improvement": 0.0
+    },
+    {
+      "query_id": "q854f9d2a",
+      "query_text": "what was the percentage change in the additions ch",
+      "original_ndcg": 0.45221360703148816,
+      "best_method_ndcg": 0.45221360703148816,
+      "improvement": 0.0
+    },
+    {
+      "query_id": "q8499ad76",
+      "query_text": "What is the sum of elements in 2011 ? (in million)",
+      "original_ndcg": 0.0,
+      "best_method_ndcg": 0.0,
+      "improvement": 0.0
+    },
+    {
+      "query_id": "q8394d504",
+      "query_text": "What is the total amount of Vested of Years Ended ",
+      "original_ndcg": 0.6131471927654584,
+      "best_method_ndcg": 0.6131471927654584,
+      "improvement": 0.0
+    },
+    {
+      "query_id": "q83406528",
+      "query_text": "what portion of the securities approved by the sec",
+      "original_ndcg": 0.0,
+      "best_method_ndcg": 0.0,
+      "improvement": 0.0
+    },
+    {
+      "query_id": "q83b59da2",
+      "query_text": "What is the sum of the Total Loans in the sections",
+      "original_ndcg": 0.11004588314904008,
+      "best_method_ndcg": 0.09478836436955078,
+      "improvement": -0.015257518779489304
+    },
+    {
+      "query_id": "q846a7bb4",
+      "query_text": "What's the average of Working capital of 2012, and",
+      "original_ndcg": 0.23719771276929622,
+      "best_method_ndcg": 0.21840743681816419,
+      "improvement": -0.01879027595113203
+    },
+    {
+      "query_id": "q83f1df74",
+      "query_text": "What is the growing rate of Fuel in the year with ",
+      "original_ndcg": 0.3576223542196109,
+      "best_method_ndcg": 0.3108658234453849,
+      "improvement": -0.046756530774226035
+    },
+    {
+      "query_id": "q81e4f9be",
+      "query_text": "In the year with largest amount of Interest rate w",
+      "original_ndcg": 0.24630238874073,
+      "best_method_ndcg": 0.19519002499605084,
+      "improvement": -0.051112363744679146
+    },
+    {
+      "query_id": "q827cc5dc",
+      "query_text": "what was the percentage change in non-cash stock-b",
+      "original_ndcg": 0.6364391809889587,
+      "best_method_ndcg": 0.46927872602275644,
+      "improvement": -0.16716045496620224
+    },
+    {
+      "query_id": "q858d93f0",
+      "query_text": "Does the average value of Services in 2012 greater",
+      "original_ndcg": 0.46927872602275644,
+      "best_method_ndcg": 0.2960819109658652,
+      "improvement": -0.17319681505689122
+    },
+    {
+      "query_id": "q81190e80",
+      "query_text": "What's the sum of Debt maturities of Thereafter, a",
+      "original_ndcg": 0.24630238874073,
+      "best_method_ndcg": 0.0,
+      "improvement": -0.24630238874073
+    },
+    {
+      "query_id": "q8185ca48",
+      "query_text": "What's the average of the Fuel for Amount in the y",
+      "original_ndcg": 0.3903800499921017,
+      "best_method_ndcg": 0.0,
+      "improvement": -0.3903800499921017
+    }
+  ]
+}

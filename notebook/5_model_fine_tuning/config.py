@@ -35,13 +35,24 @@ DATASETS = [
 
 # Dataset weights for sampling (focus on hard datasets)
 DATASET_WEIGHTS = {
-    'multiheirtt': 3.0,   # Triple weight - worst performance
-    'finqa': 1.5,
-    'tatqa': 1.5,
+    'multiheirtt': 2.0,   # Duple weight - worst performance
+    'finqa': 1.0,
+    'tatqa': 1.0,
     'convfinqa': 1.0,
     'finder': 1.0,
     'financebench': 1.0,
     'finqabench': 1.0
+}
+
+# Qrels file mapping
+QRELS_MAPPING = {
+    'convfinqa': 'ConvFinQA_qrels.tsv',
+    'financebench': 'FinanceBench_qrels.tsv',
+    'finder': 'FinDER_qrels.tsv',
+    'finqa': 'FinQA_qrels.tsv',
+    'finqabench': 'FinQABench_qrels.tsv',
+    'multiheirtt': 'MultiHeirtt_qrels.tsv',
+    'tatqa': 'TATQA_qrels.tsv',
 }
 
 # ============================================================================
