@@ -1,0 +1,31 @@
+# ============================================================================
+# 🚀 FinanceRAG Docker Compose - GPU Support
+# ============================================================================
+# This file provides GPU support extension for docker-compose.yml
+# 
+# Usage:
+#   docker-compose -f docker-compose.yml -f docker-compose.gpu.yml up
+#
+# Requirements:
+#   - NVIDIA GPU
+#   - nvidia-docker2 installed
+#   - NVIDIA Container Toolkit
+
+version: '3.8'
+
+services:
+  financerag:
+    # Enable GPU access
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    
+    # GPU-specific environment variables
+    environment:
+      - CUDA_VISIBLE_DEVICES=0
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility

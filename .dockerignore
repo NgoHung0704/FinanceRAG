@@ -1,19 +1,66 @@
+# Python cache
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
+*.egg-info/
 .Python
-.venv
+
+# Virtual environments
+.venv/
 env/
 venv/
 ENV/
+financerag_env/
+financerag_new/
+
+# Git
 .git/
 .gitignore
-*.md
+.gitattributes
+
+# IDEs
 .vscode/
 .idea/
-*.egg-info/
+*.swp
+*.swo
+*~
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# Build artifacts
 dist/
 build/
+*.egg
+
+# Data (large files)
+data/*.tsv
+data/*.jsonl
+data/chunked_corpus/*.jsonl
+
+# Output files
+notebook/*.csv
+notebook/**/*.csv
+output/
 results/
-.ipynb_checkpoints/
+
+# Model cache (will be downloaded in container)
+.cache/
+*.pt
+*.bin
+*.safetensors
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Documentation (except main README)
+README_*.md
+docs/
+
+# Docker
+docker-compose.override.yml
+.dockerignore
+Dockerfile.dev

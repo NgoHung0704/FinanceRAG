@@ -149,7 +149,7 @@ HARD_NEGATIVES_CONFIG = {
 # ============================================================================
 # LOSS FUNCTIONS
 # ============================================================================
-LOSS_FUNCTION = 'TripletLoss'  # Best for hard negative training
+LOSS_FUNCTION = 'TripletLoss'
 TRIPLET_MARGIN = 0.3           # Reduced margin for small data
 
 # ============================================================================

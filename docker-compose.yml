@@ -1,18 +1,65 @@
+# ============================================================================
+# 🐳 FinanceRAG Docker Compose Configuration
+# ============================================================================
+# Usage:
+#   - CPU only:  docker-compose up
+#   - With GPU:  docker-compose -f docker-compose.yml -f docker-compose.gpu.yml up
+
 version: '3.8'
 
 services:
   financerag:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: financerag-notebook
+    
+    # Port mapping
     ports:
-      - "8888:8888"
+      - "8888:8888"  # Jupyter Lab
+    
+    # Volume mounts
     volumes:
-      - .:/workspace
-      - financerag-cache:/root/.cache
+      - .:/workspace  # Project files
+      - financerag-cache:/root/.cache  # Hugging Face cache
+      - financerag-data:/workspace/data  # Data persistence
+      - financerag-output:/workspace/output  # Output persistence
+    
+    # Environment variables
     environment:
       - PYTHONPATH=/workspace
+      - TRANSFORMERS_CACHE=/root/.cache/huggingface
+      - HF_HOME=/root/.cache/huggingface
+      - TORCH_HOME=/root/.cache/torch
+    
+    # Working directory
     working_dir: /workspace
-    command: jupyter lab --ip=0.0.0.0 --port=8888 --no-browser --allow-root --NotebookApp.token='' --NotebookApp.password=''
+    
+    # Resource limits (adjust based on your system)
+    deploy:
+      resources:
+        limits:
+          memory: 8G
+        reservations:
+          memory: 4G
+    
+    # Keep container running
+    restart: unless-stopped
+    
+    # Default command
+    command: >
+      jupyter lab
+      --ip=0.0.0.0
+      --port=8888
+      --no-browser
+      --allow-root
+      --NotebookApp.token=''
+      --NotebookApp.password=''
 
 volumes:
   financerag-cache:
+    driver: local
+  financerag-data:
+    driver: local
+  financerag-output:
+    driver: local
