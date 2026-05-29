@@ -1,8 +1,0 @@
-dataset,best_alpha,ndcg_10,interpretation
-convfinqa,0.1,0.4384882922619096,BM25-heavy 🔤
-financebench,0.5,0.8670046486048105,Balanced ⚖️
-finder,0.4,0.4574687502200572,BM25-heavy 🔤
-finqa,0.9,0.4176377060830763,Dense-heavy 🎯
-finqabench,0.1,0.8716237438125819,BM25-heavy 🔤
-multiheirtt,0.1,0.09281554886526851,BM25-heavy 🔤
-tatqa,0.5,0.4223969014463305,Balanced ⚖️

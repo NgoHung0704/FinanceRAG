@@ -56,10 +56,35 @@ services:
       --NotebookApp.token=''
       --NotebookApp.password=''
 
+  # --------------------------------------------------------------------------
+  # 💹 Streamlit app: Retrieve -> Rerank -> Generate interface
+  # Usage:  docker-compose up -d app   ->  http://localhost:8501
+  # --------------------------------------------------------------------------
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.app
+    container_name: financerag-app
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./data:/app/data:ro            # corpora / queries / qrels
+      - ./models:/app/models:ro        # fine-tuned embedding model (optional)
+      - financerag-cache:/root/.cache  # Hugging Face model cache
+      - financerag-ragcache:/app/.rag_cache  # built FAISS/BM25 indexes
+    environment:
+      - PYTHONPATH=/app
+      - HF_HOME=/root/.cache/huggingface
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}   # set in your shell or .env to enable answers
+      - FINRAG_LLM_MODEL=${FINRAG_LLM_MODEL:-gpt-4o-mini}
+    restart: unless-stopped
+
 volumes:
   financerag-cache:
     driver: local
   financerag-data:
     driver: local
   financerag-output:
+    driver: local
+  financerag-ragcache:
     driver: local

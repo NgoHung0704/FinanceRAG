@@ -27,11 +27,11 @@ RUN apt-get update && apt-get install -y \
 FROM base as builder
 
 # Copy only requirements first (better layer caching)
-COPY requirements.txt requirements_compatible.txt ./
+COPY requirements.txt ./
 
 # Install Python packages
 RUN pip install --upgrade pip setuptools wheel && \
-    pip install -r requirements_compatible.txt
+    pip install -r requirements.txt
 
 # ============================================================================
 # Stage 2: Final image
@@ -47,7 +47,6 @@ COPY . .
 
 # Create necessary directories
 RUN mkdir -p /workspace/data \
-    /workspace/notebook \
     /workspace/output \
     /root/.cache/huggingface
 

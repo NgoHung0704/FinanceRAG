@@ -1,8 +1,0 @@
-dataset,best_reranker,ndcg_10
-convfinqa,BGE-reranker-base,0.31745730047619436
-financebench,BGE-reranker-v2-m3,0.9320849772737475
-finder,BGE-reranker-base,0.28175295903539443
-finqa,BGE-reranker-v2-m3,0.4211686243538623
-finqabench,BGE-reranker-v2-m3,0.9507906338095277
-multiheirtt,BGE-reranker-large,0.09659072531128694
-tatqa,BGE-reranker-large,0.41235251083054114

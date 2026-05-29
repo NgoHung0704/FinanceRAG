@@ -39,6 +39,71 @@ Hệ thống RAG (Retrieval-Augmented Generation) chuyên biệt cho tài liệu
 
 ---
 
+## 💹 Interactive RAG App (NEW)
+
+Ngoài pipeline notebook (thi đấu, xuất CSV theo NDCG@10), dự án giờ có một **ứng dụng RAG deploy được**: gõ câu hỏi tài chính → nhận **câu trả lời do LLM sinh ra, có trích dẫn**, dựa trên các đoạn văn bản được truy hồi.
+
+**Kiến trúc: `Retrieve → Rerank → Generate`** — giữ nguyên bộ truy hồi mạnh của dự án làm xương sống:
+
+```
+question ─▶ Hybrid retrieval (dense E5/BGE + BM25)
+         ─▶ Cross-encoder rerank (BGE-reranker-v2-m3)
+         ─▶ OpenAI answer with citations [1][2]
+```
+
+> **Why not LightRAG / GraphRAG?** Corpus ở đây nặng về **bảng số liệu** (TAT-QA, MultiHierTT) — đúng điểm yếu của graph-RAG (entity extraction kém trên bảng), lại tốn LLM để index cả corpus (10K+ docs) và không phục vụ metric NDCG@10. Bộ hybrid retriever hiện tại mạnh hơn cho dữ liệu này; LLM chỉ thêm ở tầng *generate*. (Có thể bổ sung graph mode cho dataset narrative sau.)
+
+### Run locally
+
+```bash
+# 1. Install app deps (retrieval + LLM + Streamlit)
+make install-app                      # hoặc: pip install -r requirements-app.txt
+
+# 2. (Optional) enable AI answers — không set key vẫn chạy ở chế độ retrieval-only
+export OPENAI_API_KEY=sk-...          # Windows PowerShell: $env:OPENAI_API_KEY="sk-..."
+
+# 3. (Optional) pre-build indexes so the first query is fast
+make app-build-index                  # hoặc: python scripts/build_index.py finder
+
+# 4. Launch the UI  ->  http://localhost:8501
+make app                              # hoặc: streamlit run app/streamlit_app.py
+```
+
+### Run with Docker
+
+```bash
+export OPENAI_API_KEY=sk-...          # optional
+make docker-app-up                    # -> http://localhost:8501
+```
+
+### Evaluate retrieval quality (NDCG@10, dùng chung code với app)
+
+```bash
+python scripts/run_eval.py            # tất cả datasets
+python scripts/run_eval.py --no-rerank  # ablation: tắt reranker
+```
+
+### New code layout
+
+```
+financerag_app/        # clean, unified library (lazy heavy imports)
+├── config.py          # single source of truth: per-dataset chunking/alpha/top_k
+├── data.py            # stdlib-only loaders (corpus/queries/qrels/prechunked)
+├── chunking.py        # table-aware chunking (recursive/preserve_tables/semantic)
+├── retriever.py       # HybridRetriever: FAISS dense + BM25, disk-cached
+├── reranker.py        # CrossEncoderReranker (BGE-reranker-v2-m3)
+├── generator.py       # OpenAIGenerator: grounded answers + citations
+├── pipeline.py        # RAGPipeline: retrieve → rerank → generate
+└── evaluate.py        # NDCG@10 / Recall / MRR (pure Python)
+app/streamlit_app.py   # the interface
+scripts/               # build_index.py, run_eval.py
+tests/test_core.py     # pure-Python tests (no ML stack required)
+```
+
+Config overrides via env: `FINRAG_EMBEDDING_MODEL`, `FINRAG_RERANKER_MODEL`, `FINRAG_LLM_MODEL`, `FINRAG_DATA_DIR`, `FINRAG_CACHE_DIR`, `OPENAI_API_KEY`.
+
+---
+
 ## 🐳 Quick Start với Docker (Recommended)
 
 ### Prerequisites
@@ -117,7 +182,7 @@ financerag_env\Scripts\activate
 
 # Install dependencies
 pip install --upgrade pip setuptools wheel
-pip install -r requirements_compatible.txt
+pip install -r requirements.txt
 
 # Verify installation
 python -c "import torch; print(f'PyTorch: {torch.__version__}')"
@@ -134,7 +199,7 @@ source financerag_env/bin/activate
 
 # Install dependencies
 pip install --upgrade pip setuptools wheel
-pip install -r requirements_compatible.txt
+pip install -r requirements.txt
 
 # Verify installation
 python -c "import torch; print(f'PyTorch: {torch.__version__}')"
@@ -152,14 +217,14 @@ mkdir -p data
 # Qrels files: data/<dataset>_qrels.tsv
 ```
 
-### 4. Start Jupyter
+### 4. Run the app
 
 ```bash
-# Start Jupyter Lab
-jupyter lab
+# (optional) enable AI answers
+export OPENAI_API_KEY=sk-...        # PowerShell: $env:OPENAI_API_KEY="sk-..."
 
-# Hoặc Jupyter Notebook
-jupyter notebook
+# launch the Streamlit interface -> http://localhost:8501
+streamlit run app/streamlit_app.py
 ```
 
 ---
@@ -169,53 +234,43 @@ jupyter notebook
 ```
 FinanceRAG/
 │
-├── 📂 data/                          # Datasets và preprocessed data
-│   ├── *_corpus.jsonl/              # Document corpus
-│   ├── *_queries.jsonl/             # Query sets
+├── 📂 financerag_app/                # Unified RAG library (the app core)
+│   ├── config.py                    # Single source of truth (per-dataset tuning)
+│   ├── data.py                      # Corpus/queries/qrels/prechunked loaders
+│   ├── chunking.py                  # Table-aware chunking
+│   ├── retriever.py                 # HybridRetriever (FAISS dense + BM25, cached)
+│   ├── reranker.py                  # CrossEncoderReranker (BGE-reranker-v2-m3)
+│   ├── generator.py                 # OpenAIGenerator (grounded answers + citations)
+│   ├── pipeline.py                  # RAGPipeline: retrieve → rerank → generate
+│   └── evaluate.py                  # NDCG@10 / Recall / MRR
+│
+├── 📂 app/
+│   └── streamlit_app.py             # The web interface
+│
+├── 📂 scripts/
+│   ├── build_index.py               # Pre-build & cache retrieval indexes
+│   └── run_eval.py                  # NDCG@10 evaluation (shares app code)
+│
+├── 📂 tests/
+│   └── test_core.py                 # Pure-Python tests (no ML stack needed)
+│
+├── 📂 data/                          # Datasets
+│   ├── *_corpus.jsonl/corpus.jsonl  # Document corpus
+│   ├── *_queries.jsonl/queries.jsonl  # Query sets
 │   ├── *_qrels.tsv                  # Relevance judgments
-│   └── chunked_corpus/              # Pre-chunked data (từ notebook 3)
-│       ├── *_corpus_chunked_optimal.jsonl
-│       └── best_chunking_config_per_dataset.json
+│   └── chunked_corpus/              # Pre-chunked corpora used by the retriever
+│       └── *_corpus_chunked_optimal.jsonl
 │
-├── 📂 financerag/                    # Core library
-│   ├── common/                      # Shared utilities
-│   ├── retrieval/                   # Retrieval models
-│   │   ├── bm25.py                 # BM25 implementation
-│   │   ├── dense.py                # Dense retrieval
-│   │   └── sent_encoder.py        # Sentence encoder
-│   ├── rerank/                      # Reranking models
-│   │   └── cross_encoder.py        # Cross-encoder reranker
-│   ├── generate/                    # Generation (optional)
-│   └── tasks/                       # Dataset-specific tasks
-│       ├── BaseTask.py
-│       ├── ConvFinQATask.py
-│       ├── FinanceBenchTask.py
-│       └── ...
+├── 📂 financerag/                    # Original competition library (legacy)
+│   ├── retrieval/  rerank/  generate/  tasks/  common/
 │
-├── 📂 notebook/                      # Jupyter notebooks (Main workflows)
-│   ├── 1_baseline/
-│   │   └── 1. baseline.ipynb       # Baseline pipeline
-│   ├── 2_quick_wins/
-│   │   ├── 2. quick_wins_notebook.ipynb  # Quick improvements
-│   │   ├── config.py               # Configuration
-│   │   └── utils.py                # Shared utilities
-│   ├── 3_chunking_evaluation/
-│   │   ├── 3. chunking_evaluation.ipynb  # Evaluate chunking strategies
-│   │   └── config.py
-│   └── 4_improved_chunking/
-│       ├── 4. improved_chunking_pipeline.ipynb  # Production pipeline
-│       ├── config.py               # Dataset-specific config
-│       └── utils.py
+├── 📂 models/                        # Fine-tuned embedding model (git-ignored)
 │
-├── 📂 docker/                        # Docker configuration
-│   ├── Dockerfile                  # Main Dockerfile
-│   ├── docker-compose.yml          # Docker Compose (CPU)
-│   ├── docker-compose.gpu.yml      # GPU support
-│   └── .dockerignore
-│
-├── 📄 requirements.txt              # Python dependencies (original)
-├── 📄 requirements_compatible.txt   # Compatible versions (use this!)
-├── 📄 README.md                     # This file
+├── 🐳 Dockerfile.app                 # Image for the Streamlit app
+├── 🐳 docker-compose.yml             # `app` service + (legacy) jupyter service
+├── 📄 requirements-app.txt           # App runtime deps (use this for the app)
+├── 📄 requirements.txt               # Full/legacy deps
+├── 📄 README.md
 └── 📄 LICENSE
 
 ```
@@ -224,69 +279,35 @@ FinanceRAG/
 
 ## 📖 Usage Guide
 
-### Workflow Overview
+### Workflow
 
 ```
-1️⃣ Baseline (notebook 1)
+1️⃣ build_index.py  →  cache FAISS + BM25 per dataset
    ↓
-2️⃣ Quick Wins (notebook 2) - Basic improvements
+2️⃣ streamlit_app   →  ask questions, get answers + cited passages
    ↓
-3️⃣ Chunking Evaluation (notebook 3) - Find optimal chunking per dataset
-   ↓
-4️⃣ Production Pipeline (notebook 4) - Final submission with all optimizations
+3️⃣ run_eval.py     →  measure NDCG@10 (same retrieve+rerank code as the app)
 ```
 
-### 1️⃣ Baseline Pipeline
+### Use the library directly
 
 ```python
-# Open: notebook/1_baseline/1. baseline.ipynb
+from financerag_app.config import AppConfig
+from financerag_app.pipeline import RAGPipeline
 
-# Loads data, retrieves with BGE-M3, reranks, generates submission
-# NDCG@10: ~0.328 (baseline)
+pipe = RAGPipeline(AppConfig())
+result = pipe.query("finder", "What are Microsoft's main product segments?", top_k=10)
+
+print(result.answer)                       # LLM answer with [1][2] citations (if key set)
+for p in result.passages:                  # ranked supporting passages
+    print(p.rank, p.doc_id, round(p.score, 3), p.title)
 ```
 
-### 2️⃣ Quick Wins (Recommended starting point)
+### Tune per-dataset behaviour
 
-```python
-# Open: notebook/2_quick_wins/2. quick_wins_notebook.ipynb
-
-# Features:
-# - Better models (BGE-large, BGE-reranker-v2-m3)
-# - Table-aware chunking
-# - Hybrid retrieval (Dense + BM25)
-# - Local evaluation with NDCG@10
-
-# Expected NDCG@10: ~0.40-0.50
-```
-
-### 3️⃣ Chunking Evaluation (Advanced)
-
-```python
-# Open: notebook/3_chunking_evaluation/3. chunking_evaluation.ipynb
-
-# Systematically evaluates:
-# - Semantic chunking (NEW!)
-# - Recursive chunking
-# - Fixed-size chunking
-# - Table-specific methods
-
-# Output:
-# - best_chunking_config_per_dataset.json
-# - Pre-chunked corpora for production
-```
-
-### 4️⃣ Production Pipeline (Best Performance)
-
-```python
-# Open: notebook/4_improved_chunking/4. improved_chunking_pipeline.ipynb
-
-# Uses optimal chunking from notebook 3:
-# - Semantic chunking for most datasets
-# - Dataset-specific retrieval parameters
-# - Hybrid search with tuned alpha
-
-# Expected NDCG@10: ~0.50-0.58+
-```
+`financerag_app/config.py` holds the distilled per-dataset settings (chunking
+method/size, hybrid α, retrieval depths). Override models/keys via env vars
+(`FINRAG_EMBEDDING_MODEL`, `FINRAG_LLM_MODEL`, `OPENAI_API_KEY`, …) — no code edits.
 
 ---
 
@@ -400,25 +421,15 @@ finder_task.save_results(output_dir='./results')
 ### Custom Chunking
 
 ```python
-from notebook.utils import chunk_corpus, load_jsonl
+from financerag_app.data import load_corpus
+from financerag_app.chunking import chunk_corpus
 
-# Load corpus
-corpus = load_jsonl('data/financebench_corpus.jsonl/corpus.jsonl')
+corpus = load_corpus('financebench', 'data')
 
-# Apply semantic chunking
-chunked = chunk_corpus(
-    corpus, 
-    method='semantic',
-    chunk_size=1000,
-    overlap=0.7,  # similarity threshold for semantic
-    dataset_name='financebench'
-)
-
-# Save
-import json
-with open('output/chunked_corpus.jsonl', 'w') as f:
-    for doc in chunked:
-        f.write(json.dumps(doc) + '\n')
+# method: recursive | preserve_tables | semantic | fixed | none
+# (for 'semantic', overlap is the similarity threshold)
+chunks, chunk_to_doc = chunk_corpus(corpus, method='semantic', size=1000, overlap=0.7)
+print(len(chunks), 'chunks')
 ```
 
 ---
@@ -456,8 +467,9 @@ CONFIG = {
 
 **4. Missing pre-chunked data**
 ```bash
-# Run notebook 3 first to generate optimal chunks
-# Or set use_prechunked=False in config to chunk on-the-fly
+# The retriever falls back to on-the-fly chunking automatically.
+# To force it, set use_prechunked=False on AppConfig (or it triggers when
+# data/chunked_corpus/<dataset>_corpus_chunked_optimal.jsonl is absent).
 ```
 
 ---
@@ -465,9 +477,8 @@ CONFIG = {
 ## 📚 Resources
 
 ### Documentation
-- [Chunking Evaluation Report](data/chunked_corpus/dataset_specific_evaluation_report.txt)
-- [Best Chunking Configs](data/chunked_corpus/best_chunking_config_per_dataset.json)
-- [Notebook Tutorials](notebook/)
+- [Per-dataset chunking methods](data/chunked_corpus/dataset_chunking_method_mapping.json)
+- App library: [financerag_app/](financerag_app/) · Interface: [app/streamlit_app.py](app/streamlit_app.py)
 
 ### Models
 - [BGE-large-en-v1.5](https://huggingface.co/BAAI/bge-large-en-v1.5) - Embedding model

@@ -1,9 +1,75 @@
-datasets~=3.0.0
-pydantic~=2.9.2
-pytrec_eval~=0.5
-typing_extensions~=4.12.2
+# ============================================================================
+# 🚀 FinanceRAG - Python Dependencies
+# ============================================================================
+# Tested with Python 3.10
+# Installation: pip install -r requirements.txt
+
+# Core ML Libraries
 numpy==1.26.4
-torch~=2.2.2
-nltk~=3.9.1
-sentence-transformers~=3.1.1
-openai~=1.47.1
+pandas==2.3.3
+scipy==1.10.0
+scikit-learn==1.2.2
+
+# Deep Learning
+torch==2.5.1
+transformers==4.57.3
+tokenizers==0.22.1
+safetensors==0.7.0
+accelerate==1.12.0
+peft==0.18.0
+
+# Sentence Transformers & Embeddings
+sentence-transformers==3.0.1
+FlagEmbedding==1.3.5
+
+# Retrieval & Ranking
+faiss-cpu==1.13.2
+rank-bm25==0.2.2
+
+# BEIR Evaluation
+beir==2.2.0
+pytrec_eval-terrier==0.5.10
+
+# Datasets
+datasets==2.20.0
+huggingface-hub==0.36.0
+
+# Text Processing
+nltk==3.9.2
+langchain==0.2.17
+langchain-community==0.2.10
+langchain-core==0.2.43
+langchain-text-splitters==0.2.2
+
+# Web & API
+openai==2.15.0
+requests==2.32.5
+aiohttp==3.13.2
+httpx==0.28.1
+
+# Data Validation
+pydantic==2.12.5
+pydantic_core==2.41.5
+
+# Jupyter & Visualization
+jupyter==1.1.1
+jupyterlab==4.5.1
+ipykernel==7.1.0
+ipython==9.8.0
+ipywidgets==8.1.8
+matplotlib==3.10.8
+seaborn==0.13.2
+
+# Utilities
+tqdm==4.67.1
+python-dotenv==1.2.1
+pyyaml==6.0.3
+typing-extensions==4.15.0
+
+# Optional: Vector Databases
+# chromadb==0.5.5  # Uncomment if needed
+
+# Development Tools (optional)
+# black==23.0.0
+# flake8==6.0.0
+# pytest==7.4.0

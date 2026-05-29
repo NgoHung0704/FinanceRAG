@@ -4,10 +4,23 @@
 # Usage: make <command>
 # Example: make docker-up
 
-.PHONY: help docker-up docker-down docker-logs docker-rebuild clean install jupyter test
+.PHONY: help docker-up docker-down docker-logs docker-rebuild clean install jupyter test \
+        venv install-app app app-build-index app-eval app-test docker-app-up docker-app-down
 
 # Default target
 .DEFAULT_GOAL := help
+
+# ============================================================================
+# 🐍 Environment (override on the CLI, e.g. `make venv VENV=~/finrag-venv`)
+# ============================================================================
+VENV   ?= .venv
+PYTHON ?= python3
+# Allow `make venv VENV=~/finrag-venv` (Make's $(wildcard) does not expand ~).
+VENV   := $(patsubst ~/%,$(HOME)/%,$(VENV))
+VENV_BIN := $(VENV)/bin
+# Prefer the venv's tools when the venv exists, else fall back to whatever is on PATH.
+PY        := $(if $(wildcard $(VENV_BIN)/python),$(VENV_BIN)/python,python)
+STREAMLIT := $(if $(wildcard $(VENV_BIN)/streamlit),$(VENV_BIN)/streamlit,streamlit)
 
 # ============================================================================
 # 📖 Help
@@ -58,17 +71,57 @@ docker-shell: ## Open bash shell in container
 # ============================================================================
 install: ## Install Python dependencies (local)
 	pip install --upgrade pip setuptools wheel
-	pip install -r requirements_compatible.txt
+	pip install -r requirements.txt
 	@echo "✅ Dependencies installed"
 
 install-dev: ## Install development dependencies
 	pip install --upgrade pip setuptools wheel
-	pip install -r requirements_compatible.txt
+	pip install -r requirements.txt
 	pip install jupyter jupyterlab ipywidgets
 	@echo "✅ Dev dependencies installed"
 
 jupyter: ## Start Jupyter Lab (local)
 	jupyter lab --port=8888 --no-browser
+
+# ============================================================================
+# 💹 FinanceRAG App (Retrieve -> Rerank -> Generate + Streamlit UI)
+# ============================================================================
+venv: ## Create $(VENV) + install app deps (Linux/WSL/macOS; recreates if it exists)
+	@echo "🐍 Creating virtual environment at $(VENV) ..."
+	rm -rf $(VENV)
+	$(PYTHON) -m venv $(VENV)
+	$(VENV_BIN)/python -m pip install --upgrade pip
+	$(VENV_BIN)/python -m pip install -r requirements-app.txt
+	@echo ""
+	@echo "✅ Ready. Either activate the venv:"
+	@echo "     source $(VENV)/bin/activate   &&   streamlit run app/streamlit_app.py"
+	@echo "   …or just use make (it auto-detects $(VENV)):"
+	@echo "     make app"
+
+install-app: ## Install app deps into the active env (or $(VENV) if it exists)
+	$(PY) -m pip install --upgrade pip
+	$(PY) -m pip install -r requirements-app.txt
+	@echo "✅ App dependencies installed ($(PY))"
+
+app: ## Run the Streamlit interface (http://localhost:8501)
+	$(STREAMLIT) run app/streamlit_app.py
+
+app-build-index: ## Pre-build retrieval indexes for all datasets (faster first query)
+	$(PY) scripts/build_index.py
+
+app-eval: ## Evaluate retriever NDCG@10 against qrels (competition parity)
+	$(PY) scripts/run_eval.py
+
+app-test: ## Run pure-Python core tests (no ML stack needed)
+	$(PY) tests/test_core.py
+
+docker-app-up: ## Start the Streamlit app in Docker (http://localhost:8501)
+	docker-compose up -d app
+	@echo "✅ App started! Open http://localhost:8501"
+
+docker-app-down: ## Stop the Streamlit app container
+	docker-compose stop app
+	@echo "✅ App stopped"
 
 jupyter-notebook: ## Start Jupyter Notebook classic (local)
 	jupyter notebook --port=8888 --no-browser
@@ -103,42 +156,23 @@ clean: ## Clean Python cache and temporary files
 	find . -type d -name ".ipynb_checkpoints" -exec rm -rf {} + 2>/dev/null || true
 	@echo "✅ Python cache cleaned"
 
-clean-outputs: ## Clean notebook outputs
-	jupyter nbconvert --clear-output --inplace notebook/**/*.ipynb
-	@echo "✅ Notebook outputs cleared"
+clean-cache: ## Clean built retrieval indexes (.rag_cache)
+	rm -rf .rag_cache
+	@echo "✅ Retrieval index cache cleaned"
 
 clean-models: ## Clean downloaded model cache
 	rm -rf ~/.cache/huggingface/hub/*
 	@echo "✅ Model cache cleaned"
 
-clean-all: clean clean-outputs ## Clean everything
+clean-all: clean clean-cache ## Clean everything
 	@echo "✅ Everything cleaned"
-
-# ============================================================================
-# 📊 Notebooks
-# ============================================================================
-run-baseline: ## Run baseline notebook (notebook 1)
-	jupyter nbconvert --execute --to notebook --inplace \
-		notebook/1_baseline/1.\ baseline.ipynb
-
-run-quickwins: ## Run quick wins notebook (notebook 2)
-	jupyter nbconvert --execute --to notebook --inplace \
-		notebook/2_quick_wins/2.\ quick_wins_notebook.ipynb
-
-run-chunking-eval: ## Run chunking evaluation (notebook 3)
-	jupyter nbconvert --execute --to notebook --inplace \
-		notebook/3_chunking_evaluation/3.\ chunking_evaluation.ipynb
-
-run-production: ## Run production pipeline (notebook 4)
-	jupyter nbconvert --execute --to notebook --inplace \
-		notebook/4_improved_chunking/4.\ improved_chunking_pipeline.ipynb
 
 # ============================================================================
 # 📦 Data Management
 # ============================================================================
-download-models: ## Pre-download models (run in container or local)
+download-models: ## Pre-download app models (embedding + reranker)
 	@echo "Downloading embedding model..."
-	@python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('BAAI/bge-large-en-v1.5')"
+	@python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('intfloat/e5-small-v2')"
 	@echo "Downloading reranker model..."
 	@python -c "from FlagEmbedding import FlagReranker; FlagReranker('BAAI/bge-reranker-v2-m3')"
 	@echo "✅ Models downloaded to cache"
@@ -175,11 +209,9 @@ info: ## Show system information
 # ============================================================================
 # 🎯 Quick Commands
 # ============================================================================
-quick-start: docker-up ## Quick start with Docker (recommended)
+quick-start: docker-app-up ## Quick start the app with Docker (recommended)
 	@echo "🚀 Quick start complete!"
-	@echo "📖 Open: http://localhost:8888"
-	@echo "📂 Navigate to: notebook/4_improved_chunking/"
+	@echo "📖 Open: http://localhost:8501"
 
-quick-start-local: install jupyter ## Quick start locally
-	@echo "🚀 Local environment ready!"
-	@echo "📖 Jupyter Lab starting..."
+quick-start-local: install-app app ## Quick start the app locally (install deps + run)
+	@echo "🚀 Local app starting on http://localhost:8501"

@@ -41,10 +41,11 @@ data/*.jsonl
 data/chunked_corpus/*.jsonl
 
 # Output files
-notebook/*.csv
-notebook/**/*.csv
 output/
 results/
+
+# Built retrieval indexes (rebuilt in container)
+.rag_cache/
 
 # Model cache (will be downloaded in container)
 .cache/

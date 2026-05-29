@@ -1,0 +1,24 @@
+# FinanceRAG deployable app — runtime dependencies
+# Install:  pip install -r requirements-app.txt
+# (CPU works; a CUDA GPU speeds up embedding/reranking a lot.)
+
+# Retrieval + embeddings
+sentence-transformers>=3.0.1
+faiss-cpu>=1.8.0
+rank-bm25>=0.2.2
+
+# Cross-encoder reranking (BAAI/bge-reranker-v2-m3)
+FlagEmbedding>=1.3.0
+
+# Deep learning backend (pulled in by sentence-transformers; pinned loosely)
+torch>=2.2
+
+# Answer generation
+openai>=1.40
+
+# Web interface
+streamlit>=1.36
+
+# Core
+numpy>=1.26
+python-dotenv>=1.0
