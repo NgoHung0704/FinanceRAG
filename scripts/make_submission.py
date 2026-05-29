@@ -34,12 +34,20 @@ def main() -> int:
     ap.add_argument("datasets", nargs="*", help="datasets (default: all available)")
     ap.add_argument("-o", "--output", default="submission.csv", help="output CSV path")
     ap.add_argument("--top-k", type=int, default=10, help="docs per query (default 10)")
+    ap.add_argument("--engine", choices=["hybrid", "lightrag"], default="hybrid",
+                    help="retrieval engine (default: hybrid, the proven system)")
+    ap.add_argument("--mode", default="hybrid", help="LightRAG mode (naive|local|global|hybrid|mix)")
     args = ap.parse_args()
 
     cfg = AppConfig()
     cfg.use_generation = False                 # retrieval only — submission needs ranked docs
     pipe = RAGPipeline(cfg)
     targets = [d.lower() for d in args.datasets] or list(DATASETS)
+
+    if args.engine == "lightrag":
+        print("⚠️  LightRAG engine: builds a knowledge graph over the FULL corpus of each")
+        print("    dataset with an LLM — this costs real API money and time (10K+ docs for")
+        print("    finder/multiheirtt). Validate with scripts/compare_lightrag.py first.\n")
 
     rows = [("query_id", "corpus_id")]
     total_q = 0
@@ -49,8 +57,20 @@ def main() -> int:
             print(f"  ⏭  {ds:14s} skipped ({msg})")
             continue
         queries = data_mod.load_queries(ds, cfg.data_dir)
-        print(f"  ▶  {ds:14s} {len(queries)} queries ...", flush=True)
-        results = pipe.batch_retrieve(ds, queries, top_k=args.top_k)   # {qid: [doc_id,...]}
+        print(f"  ▶  {ds:14s} {len(queries)} queries ({args.engine}) ...", flush=True)
+
+        if args.engine == "lightrag":
+            from financerag_app.lightrag_retriever import LightRAGRetriever  # lazy optional dep
+
+            lr = LightRAGRetriever(cfg, ds, mode=args.mode)
+            if not LightRAGRetriever.is_built(cfg, ds):
+                corpus = data_mod.load_corpus(ds, cfg.data_dir)
+                print(f"     building LightRAG graph over {len(corpus)} docs (LLM ingest)...", flush=True)
+                lr.build(corpus)
+            results = {q["_id"]: lr.retrieve(q["text"], top_k=args.top_k) for q in queries}
+        else:
+            results = pipe.batch_retrieve(ds, queries, top_k=args.top_k)   # {qid: [doc_id,...]}
+
         for qid, docs in results.items():
             for cid in docs[: args.top_k]:
                 rows.append((qid, cid))
