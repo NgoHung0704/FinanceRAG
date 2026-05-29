@@ -6,7 +6,7 @@
 
 .PHONY: help docker-up docker-down docker-logs docker-rebuild clean install jupyter test \
         venv install-app app app-build-index app-eval app-test docker-app-up docker-app-down \
-        diagnose install-lightrag compare-lightrag
+        diagnose install-lightrag compare-lightrag submission
 
 # Default target
 .DEFAULT_GOAL := help
@@ -112,6 +112,9 @@ app-build-index: ## Pre-build retrieval indexes for all datasets (faster first q
 
 app-eval: ## Evaluate retriever NDCG@10 against qrels (competition parity)
 	$(PY) scripts/run_eval.py
+
+submission: ## Generate competition submission.csv (query_id,corpus_id; top-10/query)
+	$(PY) scripts/make_submission.py $(DATASETS)
 
 app-test: ## Run pure-Python core tests (no ML stack needed)
 	$(PY) tests/test_core.py
