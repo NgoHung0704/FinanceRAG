@@ -11,12 +11,16 @@ for generative QA, not ranked retrieval, so we:
    appearance, to produce a ranked document list for NDCG.
 
 ⚠️ Caveats (read before trusting numbers):
-* Needs ``pip install lightrag-hku`` and ``OPENAI_API_KEY`` (LLM is used to build
-  the knowledge graph at ingest time — that is the expensive step).
-* Uses OpenAI embeddings (text-embedding-3-small), NOT the project's e5 model, so
-  a win/loss vs the hybrid baseline mixes "graph vs no-graph" with "different
-  embeddings". Treat it as "does LightRAG-as-configured do better", not a clean
-  graph ablation.
+* Needs ``pip install lightrag-hku`` and an LLM key (the LLM builds the knowledge
+  graph at ingest time — the expensive step). Configurable via env:
+  - LLM: defaults to OpenAI ``gpt-4o-mini``; point it at a cheap OpenAI-compatible
+    provider like DeepSeek with LIGHTRAG_LLM_BASE_URL / LIGHTRAG_LLM_MODEL /
+    DEEPSEEK_API_KEY (see .env.example).
+  - Embeddings: default is a FREE local model (``BAAI/bge-small-en-v1.5``); note
+    DeepSeek has no embedding endpoint. Set LIGHTRAG_EMBED=openai to use OpenAI.
+* The embedding model differs from the hybrid baseline's e5, so a win/loss mixes
+  "graph vs no-graph" with "different embeddings" — read it as "does LightRAG-as-
+  configured do better", not a clean graph ablation.
 * DOCID markers survive only in chunks that contain a document's start, so
   recovery is most reliable on short-document datasets (finqabench, financebench).
 * LightRAG's API has shifted across releases; imports/init below are defensive
@@ -26,6 +30,7 @@ for generative QA, not ranked retrieval, so we:
 from __future__ import annotations
 
 import asyncio
+import os
 import re
 from pathlib import Path
 from typing import List
@@ -67,22 +72,90 @@ def _run(coro):
             loop.close()
 
 
-def _import_lightrag():
-    """Import LightRAG + OpenAI helpers, tolerating version differences."""
+def _load_classes():
+    """Import LightRAG core classes, tolerating version differences."""
     from lightrag import LightRAG, QueryParam  # noqa: WPS433
 
-    llm_func = embed_func = None
-    try:  # newer layout
-        from lightrag.llm.openai import gpt_4o_mini_complete, openai_embed  # type: ignore
-        llm_func, embed_func = gpt_4o_mini_complete, openai_embed
+    try:
+        from lightrag.utils import EmbeddingFunc  # type: ignore
+    except Exception:  # pragma: no cover
+        from lightrag import EmbeddingFunc  # type: ignore
+    return LightRAG, QueryParam, EmbeddingFunc
+
+
+def _openai_complete():
+    """The OpenAI-compatible completion helper (works for DeepSeek too)."""
+    try:
+        from lightrag.llm.openai import openai_complete_if_cache  # type: ignore
     except Exception:  # pragma: no cover - older layout
-        from lightrag.llm import gpt_4o_mini_complete  # type: ignore
+        from lightrag.llm import openai_complete_if_cache  # type: ignore
+    return openai_complete_if_cache
+
+
+def _build_llm_func():
+    """LLM used to extract the knowledge graph at ingest time.
+
+    Configurable so you can point it at a cheap OpenAI-compatible provider like
+    DeepSeek (set LIGHTRAG_LLM_BASE_URL=https://api.deepseek.com/v1,
+    LIGHTRAG_LLM_MODEL=deepseek-chat, DEEPSEEK_API_KEY=...). This is the
+    expensive part of LightRAG, so a cheap LLM here matters most.
+    """
+    complete = _openai_complete()
+    base_url = os.getenv("LIGHTRAG_LLM_BASE_URL") or None
+    model = os.getenv("LIGHTRAG_LLM_MODEL", "gpt-4o-mini")
+    api_key = (
+        os.getenv("LIGHTRAG_LLM_API_KEY")
+        or os.getenv("DEEPSEEK_API_KEY")
+        or os.getenv("OPENAI_API_KEY")
+    )
+
+    async def llm_func(prompt, system_prompt=None, history_messages=None, **kwargs):
+        return await complete(
+            model,
+            prompt,
+            system_prompt=system_prompt,
+            history_messages=history_messages or [],
+            base_url=base_url,
+            api_key=api_key,
+            **kwargs,
+        )
+
+    return llm_func
+
+
+def _build_embedding_func(EmbeddingFunc):
+    """Embeddings for LightRAG's vector layer.
+
+    Default = a FREE local sentence-transformers model (no embedding API cost;
+    note DeepSeek has no embedding endpoint). Set LIGHTRAG_EMBED=openai to use
+    OpenAI text-embedding-3-small instead.
+    """
+    kind = os.getenv("LIGHTRAG_EMBED", "local").lower()
+
+    if kind == "openai":
         try:
+            from lightrag.llm.openai import openai_embed  # type: ignore
+        except Exception:  # pragma: no cover
             from lightrag.llm import openai_embed  # type: ignore
-        except Exception:
-            from lightrag.llm import openai_embedding as openai_embed  # type: ignore
-        llm_func, embed_func = gpt_4o_mini_complete, openai_embed
-    return LightRAG, QueryParam, llm_func, embed_func
+        model = os.getenv("LIGHTRAG_EMBED_MODEL", "text-embedding-3-small")
+        api_key = os.getenv("OPENAI_API_KEY")
+
+        async def ef(texts):
+            return await openai_embed(texts, model=model, api_key=api_key)
+
+        return EmbeddingFunc(embedding_dim=1536, max_token_size=8192, func=ef)
+
+    # local (free) — bge-small needs no query/passage prefixes, unlike e5
+    from sentence_transformers import SentenceTransformer  # lazy
+
+    name = os.getenv("LIGHTRAG_EMBED_MODEL", "BAAI/bge-small-en-v1.5")
+    st_model = SentenceTransformer(name)
+    dim = st_model.get_sentence_embedding_dimension()
+
+    async def ef(texts):
+        return st_model.encode(list(texts), normalize_embeddings=True)
+
+    return EmbeddingFunc(embedding_dim=dim, max_token_size=512, func=ef)
 
 
 class LightRAGRetriever:
@@ -98,14 +171,14 @@ class LightRAGRetriever:
     def _get_rag(self):
         if self._rag is not None:
             return self._rag
-        LightRAG, QueryParam, llm_func, embed_func = _import_lightrag()
+        LightRAG, QueryParam, EmbeddingFunc = _load_classes()
         self._QueryParam = QueryParam
         self.working_dir.mkdir(parents=True, exist_ok=True)
 
         rag = LightRAG(
             working_dir=str(self.working_dir),
-            llm_model_func=llm_func,
-            embedding_func=embed_func,
+            llm_model_func=_build_llm_func(),
+            embedding_func=_build_embedding_func(EmbeddingFunc),
         )
         # Newer LightRAG requires explicit async storage init.
         for attr in ("initialize_storages",):
