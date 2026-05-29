@@ -1,8 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(python tests/test_core.py)",
-      "Bash(git commit -q -m ' *)"
-    ]
-  }
-}
