@@ -22,3 +22,8 @@ streamlit>=1.36
 # Core
 numpy>=1.26
 python-dotenv>=1.0
+
+# Optional: LightRAG comparison experiment (scripts/compare_lightrag.py)
+# Heavy + needs OPENAI_API_KEY; install only if running the comparison:
+#   pip install lightrag-hku   (or: make install-lightrag)
+# lightrag-hku>=1.0

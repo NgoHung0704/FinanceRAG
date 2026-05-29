@@ -5,7 +5,8 @@
 # Example: make docker-up
 
 .PHONY: help docker-up docker-down docker-logs docker-rebuild clean install jupyter test \
-        venv install-app app app-build-index app-eval app-test docker-app-up docker-app-down
+        venv install-app app app-build-index app-eval app-test docker-app-up docker-app-down \
+        diagnose install-lightrag compare-lightrag
 
 # Default target
 .DEFAULT_GOAL := help
@@ -114,6 +115,16 @@ app-eval: ## Evaluate retriever NDCG@10 against qrels (competition parity)
 
 app-test: ## Run pure-Python core tests (no ML stack needed)
 	$(PY) tests/test_core.py
+
+# --- Experiments: diagnose retrieval, and compare against LightRAG ---------
+diagnose: ## Diagnose retrieval-vs-ranking (recall@100 vs NDCG@10; no API cost)
+	$(PY) scripts/diagnose.py $(DATASETS)
+
+install-lightrag: ## Install LightRAG (for the comparison experiment only)
+	$(PY) -m pip install lightrag-hku
+
+compare-lightrag: ## Compare hybrid vs LightRAG NDCG@10 (needs lightrag-hku + OPENAI_API_KEY)
+	$(PY) scripts/compare_lightrag.py $(DATASETS)
 
 docker-app-up: ## Start the Streamlit app in Docker (http://localhost:8501)
 	docker-compose up -d app

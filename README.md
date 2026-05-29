@@ -83,6 +83,25 @@ python scripts/run_eval.py            # tất cả datasets
 python scripts/run_eval.py --no-rerank  # ablation: tắt reranker
 ```
 
+### Thử nghiệm: chẩn đoán + so sánh LightRAG
+
+```bash
+# 1) Chẩn đoán retrieval-vs-ranking (RẺ, không tốn API)
+python scripts/diagnose.py
+#    Rec@100 cao + NDCG@10 thấp  -> lỗi XẾP HẠNG (sửa reranker/alpha); LightRAG không giúp
+#    Rec@100 thấp                -> lỗi RETRIEVAL; mới đáng đổi paradigm
+
+# 2) So sánh hybrid vs LightRAG, NDCG@10 retrieve-only (cần OPENAI_API_KEY)
+make install-lightrag
+export OPENAI_API_KEY=sk-...
+python scripts/compare_lightrag.py    # finqabench + financebench + mẫu multiheirtt
+```
+
+> ⚠️ LightRAG dựng knowledge graph bằng LLM lúc index (tốn phí, chậm) và mạnh nhất cho
+> văn bản tự sự multi-hop — **yếu ở bảng số** (multiheirtt/tatqa). So sánh là retrieve-only;
+> LightRAG dùng embedding OpenAI nên chênh lệch trộn cả "graph vs không" lẫn "embedding khác".
+> Coi đây là phép thử thực nghiệm để xem số thật, không phải ablation thuần.
+
 ### New code layout
 
 ```
@@ -94,9 +113,10 @@ financerag_app/        # clean, unified library (lazy heavy imports)
 ├── reranker.py        # CrossEncoderReranker (BGE-reranker-v2-m3)
 ├── generator.py       # OpenAIGenerator: grounded answers + citations
 ├── pipeline.py        # RAGPipeline: retrieve → rerank → generate
-└── evaluate.py        # NDCG@10 / Recall / MRR (pure Python)
+├── evaluate.py        # NDCG@10 / Recall / MRR (pure Python)
+└── lightrag_retriever.py  # optional graph-RAG (LightRAG) for comparison
 app/streamlit_app.py   # the interface
-scripts/               # build_index.py, run_eval.py
+scripts/               # build_index.py, run_eval.py, diagnose.py, compare_lightrag.py
 tests/test_core.py     # pure-Python tests (no ML stack required)
 ```
 

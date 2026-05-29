@@ -195,3 +195,20 @@ class RAGPipeline:
             passages = self._retrieve_and_rerank(dataset, q["text"], top_k, alpha=None)
             results[q["_id"]] = [p.doc_id for p in passages]
         return results
+
+    def retrieve_only(self, dataset: str, question: str, depth: int = 100) -> List[str]:
+        """Ranked doc ids straight from the hybrid retriever, WITHOUT reranking.
+
+        Used by the diagnostic to measure the retrieval ceiling (recall@depth):
+        whether a relevant document is even in the candidate pool, independent of
+        how the reranker orders the top-10.
+        """
+        dc = get_dataset_config(dataset)
+        idx = self.load_dataset(dataset)
+        hits = idx.retriever.retrieve(
+            question,
+            top_k_retrieval=max(dc.top_k_retrieval, depth * 2),
+            alpha=dc.hybrid_alpha,
+            top_k_docs=depth,
+        )
+        return [h.doc_id for h in hits]

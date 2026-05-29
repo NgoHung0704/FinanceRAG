@@ -100,6 +100,15 @@ def test_build_messages_structure():
     assert "[1]" in msgs[1]["content"]
 
 
+def test_lightrag_parse_doc_ids_order_dedup_limit():
+    from financerag_app.lightrag_retriever import parse_doc_ids
+
+    ctx = "...DOCID::doc9:: text ...DOCID::doc3:: more ...DOCID::doc9:: again ...DOCID::doc1::"
+    assert parse_doc_ids(ctx, top_k=10) == ["doc9", "doc3", "doc1"]   # order + dedup
+    assert parse_doc_ids(ctx, top_k=2) == ["doc9", "doc3"]            # top_k limit
+    assert parse_doc_ids("", top_k=5) == []                          # empty safe
+
+
 def _run_all():
     fns = [v for k, v in sorted(globals().items()) if k.startswith("test_") and callable(v)]
     passed = 0
