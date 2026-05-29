@@ -125,6 +125,7 @@ celerybeat.pid
 .env
 .venv
 .venv-*/
+financerag_env/
 env/
 venv/
 ENV/
