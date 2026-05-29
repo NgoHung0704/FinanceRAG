@@ -174,3 +174,14 @@ models/
 
 # Scratch: extracted notebook sources for analysis
 .nb_extract/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editors (local workspace config)
+.vscode/
+
+# Streamlit (never commit API keys / secrets)
+.streamlit/secrets.toml
